@@ -957,4 +957,3 @@ pub const tag_to_name = [957][]const u8{
     "LegContractSettlMonth",
     "LegInterestAccrualDate",
 };
-

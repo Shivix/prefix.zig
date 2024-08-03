@@ -20,7 +20,7 @@ const usage =
     \\       --version               Enable version mode
 ;
 
-fn parseArgs() !struct {Opts, []const u8} {
+fn parseArgs() !struct { Opts, []const u8 } {
     var args = std.process.args();
     _ = args.skip();
     var opts = Opts{};
@@ -53,7 +53,7 @@ fn parseArgs() !struct {Opts, []const u8} {
             msg = arg;
         }
     }
-    return .{opts, msg};
+    return .{ opts, msg };
 }
 
 const stdout_file = std.io.getStdOut();
@@ -79,22 +79,23 @@ fn pretty_print_fix(input: []const u8, opts: *const Opts) !void {
         try stdout.print("{s}\n", .{input});
         return;
     }
-    var fields = std.mem.splitAny(u8, input[start..end + 6], "\x01|^");
+    var fields = std.mem.splitAny(u8, input[start .. end + 6], "\x01|^");
     while (fields.next()) |field| {
         var split = std.mem.splitScalar(u8, field, '=');
         const tag = try std.fmt.parseInt(usize, split.first(), 10);
         const value = split.next().?;
         const tag_name = if (tag < tags.len) tags[tag] else split.first();
-        const equals = " = ";
+        const equals = if (opts.strip) "=" else " = ";
         const delimiter = opts.delimiter;
         const should_colour = std.mem.eql(u8, opts.colour, "auto") and stdout_file.isTty() or std.mem.eql(u8, opts.colour, "always");
 
         if (should_colour) {
-            try stdout.print("{s}\x1b[33m{s}\x1b[0m{s}\x1b[33m{s}\x1b[0m", .{tag_name, equals, value, delimiter});
+            try stdout.print("{s}\x1b[33m{s}\x1b[0m{s}\x1b[33m{s}\x1b[0m", .{ tag_name, equals, value, delimiter });
         } else {
-            try stdout.print("{s}{s}{s}{s}", .{tag_name, equals, value, delimiter});
+            try stdout.print("{s}{s}{s}{s}", .{ tag_name, equals, value, delimiter });
         }
     }
+    try stdout.print("\n", .{});
 }
 
 fn pretty_print_tag(input: []const u8) !void {
@@ -115,7 +116,7 @@ pub fn main() !void {
     if (opts.help) {
         try stdout.print(usage, .{});
         return;
-    } else if(opts.version) {
+    } else if (opts.version) {
         //try stdout.print("{s}", builtin.version);
         return;
     } else if (opts.tag) {
@@ -136,8 +137,6 @@ pub fn main() !void {
     try bw.flush();
 }
 
-test "parse args test" {
-}
+test "parse args test" {}
 
-test "pretty print test" {
-}
+test "pretty print test" {}
